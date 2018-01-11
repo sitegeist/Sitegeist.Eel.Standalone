@@ -14,6 +14,6 @@ namespace Sitegeist\Eel\Standalone;
 /**
  * A general Eel exception
  */
-class Exception extends \Neos\Flow\Exception
+class Exception extends \Exception
 {
 }

@@ -11,15 +11,12 @@ namespace Sitegeist\Eel\Standalone;
  * source code.
  */
 
-use Neos\Flow\Package\Package as BasePackage;
-use Neos\Flow\Annotations as Flow;
-
 /**
  * Package base class of the Eel package.
  *
  * @Flow\Scope("singleton")
  */
-class Package extends BasePackage
+class Package
 {
     const EelExpressionRecognizer = '/
 			^\${(?P<exp>

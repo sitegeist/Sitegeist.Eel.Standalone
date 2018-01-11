@@ -14,6 +14,6 @@ namespace Sitegeist\Eel\Standalone;
 /**
  * Some exception that occurred during parsing of an expression
  */
-class ParserException extends \Neos\Flow\Exception
+class ParserException extends \Exception
 {
 }

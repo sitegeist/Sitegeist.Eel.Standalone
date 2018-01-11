@@ -2,16 +2,12 @@
 namespace Sitegeist\Eel\Standalone\Validation;
 
 use Sitegeist\Eel\Standalone\EelParser;
-use Neos\Flow\Annotations as Flow;
-use Neos\Flow\Validation\Validator\AbstractValidator;
 
 /**
  * A validator which checks for the correct syntax of an eel expression (without the wrapping ${…}).
  * This is basically done by giving it to the parser and checking if its result is valid.
- *
- * @api
  */
-class ExpressionSyntaxValidator extends AbstractValidator
+class ExpressionSyntaxValidator
 {
     /**
      * Check if $value is valid. If it is not valid, needs to add an error

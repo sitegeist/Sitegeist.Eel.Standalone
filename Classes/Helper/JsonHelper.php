@@ -11,7 +11,6 @@ namespace Sitegeist\Eel\Standalone\Helper;
  * source code.
  */
 
-use Neos\Flow\Annotations as Flow;
 use Sitegeist\Eel\Standalone\ProtectedContextAwareInterface;
 
 /**

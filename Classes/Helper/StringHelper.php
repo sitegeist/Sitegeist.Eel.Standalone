@@ -13,7 +13,7 @@ namespace Sitegeist\Eel\Standalone\Helper;
 
 use Sitegeist\Eel\Standalone\EvaluationException;
 use Sitegeist\Eel\Standalone\ProtectedContextAwareInterface;
-use Neos\Flow\Annotations as Flow;
+
 use Neos\Utility\Unicode\Functions as UnicodeFunctions;
 use Neos\Utility\Unicode\TextIterator;
 
