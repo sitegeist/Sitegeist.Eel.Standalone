@@ -1,0 +1,20 @@
+{
+    "name": "sitegeist/eel-standalone",
+    "type": "library",
+    "license": ["MIT"],
+    "description": "Standalone version of neos/eel without dependency to the neos/flow framework",
+    "require": {
+        "neos/utility-unicode": "*",
+        "neos/utility-objecthandling": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sitegeist\\Eel\\Standalone\\": "Classes"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Sitegeist\\Eel\\Standalone\\Tests\\": "Tests"
+        }
+    }
+}
