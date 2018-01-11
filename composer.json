@@ -4,8 +4,8 @@
     "license": ["MIT"],
     "description": "Standalone version of neos/eel without dependency to the neos/flow framework",
     "require": {
-        "neos/utility-unicode": "*",
-        "neos/utility-objecthandling": "*"
+        "neos/utility-unicode": "~4.3",
+        "neos/utility-objecthandling":"~4.3"
     },
     "autoload": {
         "psr-4": {
