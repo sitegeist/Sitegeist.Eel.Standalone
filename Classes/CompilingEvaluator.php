@@ -11,7 +11,7 @@ namespace Sitegeist\Eel\Standalone;
  * source code.
  */
 
-use Neos\Cache\Frontend\PhpFrontend;
+use Psr\SimpleCache\CacheInterface as SimpleCacheInterface;
 
 /**
  * An evaluator that compiles expressions down to PHP code
@@ -23,49 +23,24 @@ use Neos\Cache\Frontend\PhpFrontend;
 class CompilingEvaluator implements EelEvaluatorInterface
 {
     /**
-     * @var array
+     * Runtime cache of execution ready closures.
+     *
+     * @var \closure[]
      */
-    protected $newExpressions = [];
+    protected $evaluatedExpressions = [];
 
     /**
-     * @var PhpFrontend
+     * @var SimpleCacheInterface
      */
     protected $expressionCache;
 
     /**
      * CompilingEvaluator constructor.
-     * @param PhpFrontend $expressionCache
+     * @param SimpleCacheInterface $expressionCache
      */
-    public function __construct(PhpFrontend $expressionCache)
+    public function __construct(SimpleCacheInterface $expressionCache)
     {
         $this->expressionCache = $expressionCache;
-        $this->expressionCache->requireOnce('cachedExpressionClosures');
-    }
-
-    /**
-     * Shutdown the Evaluator
-     */
-    public function shutdownObject()
-    {
-        if (count($this->newExpressions) > 0) {
-            $changesToPersist = false;
-            $codeToBeCached = $this->expressionCache->get('cachedExpressionClosures');
-            /**
-             * At this point a race condition could happen, that we try to prevent with an additional check.
-             * So we compare the evaluated expressions during this request with the methods the cache has at
-             * this point and only add methods that are not present. Only if we added anything we write the cache.
-             */
-            foreach ($this->newExpressions as $functionName => $newExpression) {
-                if (strpos($codeToBeCached, $functionName) === false) {
-                    $codeToBeCached .= 'if (!function_exists(\'' . $functionName . '\')) { ' . $newExpression . ' }' . chr(10);
-                    $changesToPersist = true;
-                }
-            }
-
-            if ($changesToPersist) {
-                $this->expressionCache->set('cachedExpressionClosures', $codeToBeCached);
-            }
-        }
     }
 
     /**
@@ -80,20 +55,31 @@ class CompilingEvaluator implements EelEvaluatorInterface
         $expression = trim($expression);
         $identifier = md5($expression);
         $functionName = 'expression_' . $identifier;
-
-        if (!function_exists($functionName)) {
-            $code = $this->generateEvaluatorCode($expression);
-            $functionDeclaration = 'function ' . $functionName . '($context){return ' . $code . ';}';
-            $this->newExpressions[$functionName] = $functionDeclaration;
-            eval($functionDeclaration);
+        if (isset($this->evaluatedExpressions[$functionName])) {
+            return $this->evaluateAndUnwrap($this->evaluatedExpressions[$functionName], $context);
         }
+        //$functionDeclaration = $this->expressionCache->get($functionName);
+        if (!$functionDeclaration) {
+            $functionDeclaration = $this->generateEvaluatorCode($expression);
+            //$this->expressionCache->set($functionName, $functionDeclaration);
+        }
+        $expressionFunction = eval($functionDeclaration);
+        $this->evaluatedExpressions[$functionName] = $expressionFunction;
+        return $this->evaluateAndUnwrap($expressionFunction, $context);
+    }
 
-        $result = $functionName($context);
+    /**
+     * @param \closure $expressionFunction
+     * @param Context $context
+     * @return mixed
+     */
+    protected function evaluateAndUnwrap(\closure $expressionFunction, Context $context)
+    {
+        $result = $expressionFunction($context);
         if ($result instanceof Context) {
             return $result->unwrap();
-        } else {
-            return $result;
         }
+        return $result;
     }
 
     /**
@@ -117,6 +103,6 @@ class CompilingEvaluator implements EelEvaluatorInterface
         } elseif (!array_key_exists('code', $result)) {
             throw new ParserException(sprintf('Parser error, no code in result %s ', json_encode($result)), 1334491498);
         }
-        return $result['code'];
+        return 'return function ($context) {return ' . $result['code'] . ';};';
     }
 }
