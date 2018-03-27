@@ -58,10 +58,10 @@ class CompilingEvaluator implements EelEvaluatorInterface
         if (isset($this->evaluatedExpressions[$functionName])) {
             return $this->evaluateAndUnwrap($this->evaluatedExpressions[$functionName], $context);
         }
-        //$functionDeclaration = $this->expressionCache->get($functionName);
+        $functionDeclaration = $this->expressionCache->get($functionName);
         if (!$functionDeclaration) {
             $functionDeclaration = $this->generateEvaluatorCode($expression);
-            //$this->expressionCache->set($functionName, $functionDeclaration);
+            $this->expressionCache->set($functionName, $functionDeclaration);
         }
         $expressionFunction = eval($functionDeclaration);
         $this->evaluatedExpressions[$functionName] = $expressionFunction;
